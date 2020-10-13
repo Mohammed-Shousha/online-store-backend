@@ -7,7 +7,7 @@ const handleUploadingImage = async (req, res, products) => {
     )
     const product = await products.findOne({ id })
     res.json({ product, result })
-    res.json('Sz')
+    res.json('S')
 }
 
 module.exports = handleUploadingImage

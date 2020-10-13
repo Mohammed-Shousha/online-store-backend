@@ -21,6 +21,14 @@ const { handleConfirmation, handleResendEmail } = require('./controllers/confirm
 	try {
 		const client = await MongoClient.connect(process.env.MONGO_URI, { useUnifiedTopology: true })
 		const db = client.db('DB')
+
+		const users = db.collection('Users')
+		const products = db.collection('Products')
+
+		app.use(express.json())
+		// app.use(express.urlencoded({ extended: true }))
+		app.use(cors())
+		
 		// let photosBucket = new GridFSBucket(db, {
 		// 	bucketName: 'Photos'
 		// })
@@ -46,25 +54,7 @@ const { handleConfirmation, handleResendEmail } = require('./controllers/confirm
 		// 	}
 		// })
 		// const upload = multer({ storage })
-		const users = db.collection('Users')
-		const products = db.collection('Products')
-
-		app.use(express.json())
-		// app.use(express.urlencoded({ extended: true }))
-		app.use(cors())
-
-		app.get('/', async (req, res) => {
-			const resultCursor = users.find({})
-			const result = await resultCursor.toArray()
-			res.json(result)
-		})
-
-		app.get('/products', async (req, res) => {
-			const resultCursor = products.find({})
-			const result = await resultCursor.toArray()
-			res.json(result)
-		})
-
+		
 		// app.get('/photos', async (req, res) => {
 		// 	iconsBucket.find().toArray((err, files) => {
 		// 		res.json(files)
@@ -91,6 +81,41 @@ const { handleConfirmation, handleResendEmail } = require('./controllers/confirm
 		// 	// 	})
 		// 	// })
 		// })
+
+		// app.post('uploadicons', upload.array('icons', 20), (req, res) =>{
+		// 	res.json('S')
+		// })
+
+		// app.post('/uploadimage/:productId', upload.single('file'), async(req, res) =>{
+			// 	const { id, filename } = req.file
+			// 	const result = await products.updateOne(
+			// 		{ id : Number(req.params.productId) },
+			// 		{ $set: { photo: { id, filename } } }
+			// 	)
+			// res.json(result)
+		// })
+
+		// app.get('/productphoto/:id', async(req, res) =>{
+			// 	const product = await products.findOne({id: Number(req.params.id)})
+			// 	const photoId = product.photo[0].id
+			// 	photosBucket.find({ _id: photoId }).toArray((err, files) =>{
+		// 			photosBucket.openDownloadStream(ObjectId(photoId)).pipe(res)
+		// 		})
+		// })
+	
+
+		app.get('/', async (req, res) => {
+			const resultCursor = users.find({})
+			const result = await resultCursor.toArray()
+			res.json(result)
+		})
+
+		app.get('/products', async (req, res) => {
+			const resultCursor = products.find({})
+			const result = await resultCursor.toArray()
+			res.json(result)
+		})
+
 		app.post('/signup', (req, res) => handleSignUp(req, res, users))
 		
 		app.post('/confirm/:id', (req, res) => handleConfirmation(req, res, users))
@@ -121,27 +146,6 @@ const { handleConfirmation, handleResendEmail } = require('./controllers/confirm
 		
 		app.post('/payment', (req, res) => handlePayment(req, res, users, products))
 		
-		// app.post('uploadicons', upload.array('icons', 20), (req, res) =>{
-		// 	res.json('S')
-		// })
-		
-		// app.post('/uploadimage/:productId', upload.single('file'), async(req, res) =>{
-			// 	const { id, filename } = req.file
-			// 	const result = await products.updateOne(
-				// 		{ id : Number(req.params.productId) },
-				// 		{ $set: { photo: { id, filename } } }
-				// 	)
-				// 	res.json(result)
-				// })
-				
-				// app.get('/productphoto/:id', async(req, res) =>{
-					// 	const product = await products.findOne({id: Number(req.params.id)})
-					// 	const photoId = product.photo[0].id
-					// 	photosBucket.find({ _id: photoId }).toArray((err, files) =>{
-						// 		photosBucket.openDownloadStream(ObjectId(photoId)).pipe(res)
-						// 	})
-						// })
-						
 		app.get('/findById/:id', async (req, res) => {
 			const user = await users.findOne({_id: ObjectId(req.params.id)})
 			res.json(user)
