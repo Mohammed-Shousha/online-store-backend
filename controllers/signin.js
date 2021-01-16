@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt')
 
-const handleSignIn = async (req, res, col) => {
+const handleSignIn = async (req, res, users) => {
     const { email, password } = req.body
-    const user = await col.findOne({ email })
+    const user = await users.findOne({ email })
     if(user){
         const isValid = await bcrypt.compare(password, user.password.hash)
         if (isValid) {
@@ -11,8 +11,24 @@ const handleSignIn = async (req, res, col) => {
             res.status(400).json('Wrong Email or Password')
         }
     }else{
-        res.status(400).json('Wrong Email or Password') // email not registered
+        res.status(400).json('Email Not Registered')
     }
 }
 
-module.exports = handleSignIn
+//GraphQL
+const handleSignInGraphQL = async (args, users) => {
+    const { email, password } = args
+    const user = await users.findOne({ email })
+    if(user){
+        const isValid = await bcrypt.compare(password, user.password.hash)
+        if (isValid) {
+            return user
+        } else {
+            return { message: 'Wrong Email or Password' }
+        }
+    }else{
+        return { message: 'Email Not Registered' }
+    }
+}
+
+module.exports = { handleSignIn, handleSignInGraphQL }

@@ -45,8 +45,42 @@ const addUser = async (req, res, users) => {
         res.json({user, emailSent: "Email Sent" })
     }else{
         res.json({ user })
-    }
-    
+    } 
 }
 
-module.exports = handleSignUp
+//GraphQL
+const handleSignUpGraphQL = async (args, users) => {
+    const { email } = args
+    const user = await users.findOne({ email })
+    if (user) return { message: "This Email Already Have an Account Linked to It" }
+    const result = addUserGraphQL(args, users)
+    return result
+}
+
+const addUserGraphQL = async (args, users) => {
+    const { name, email, password, phone, address } = args
+    let addresses = address ? [{ id: ObjectId(), name, address, phone }] : []
+    const hash = await bcrypt.hash(password, saltRounds)
+
+    let newUser = {
+        name,
+        email,
+        confirmed: false,
+        password: { hash, length: password.length },
+        phone,
+        addresses: addresses,
+        cartItems: [],
+        orders: []
+    }
+
+    await users.insertOne(newUser)
+    const user = await users.findOne({ email })
+    const messageId = await sendEmail(user)
+    if (messageId) {
+        return { user, emailSent: true }
+    } else {
+        return { user, emailSent: false }
+    }
+}
+
+module.exports = { handleSignUp, handleSignUpGraphQL }

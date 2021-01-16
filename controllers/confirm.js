@@ -44,8 +44,33 @@ const handleConfirmation = async (req, res, users) => {
     res.json(result)
 }
 
+//GraphQL
+const handleResendEmailGraphQL = async (args, users) =>{
+    const { email } = args
+    const user = await users.findOne({ email })
+    const id = await sendEmail(user)
+    if(id){
+        return 'Success'
+    }else{
+        return 'Failed'
+    }
+}
+
+const handleConfirmationGraphQL = async (args, users) => {
+    const { id } = args 
+    const result = await users.updateOne(
+        { _id: ObjectId(id) },
+        { $set: {
+            confirmed: true
+        }}
+    )
+    return result.result.nModified
+}
+
 module.exports = {
     handleConfirmation,
     handleResendEmail,
-    sendEmail
+    sendEmail,
+    handleResendEmailGraphQL,
+    handleConfirmationGraphQL
 }
