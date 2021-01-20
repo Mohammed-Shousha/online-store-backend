@@ -1,5 +1,7 @@
 const express = require('express')
 require('dotenv').config()
+const app = express()
+const cors = require('cors')
 const { ApolloServer, gql } = require('apollo-server-express')
 const { MongoClient, ObjectId } = require('mongodb')
 const { handleSignUpGraphQL } = require('./controllers/signup') 
@@ -9,16 +11,19 @@ const { handleResendEmailGraphQL, handleConfirmationGraphQL } = require('./contr
 const { handleAddingOrderGraphQL, handleRemovingOrderGraphQL } = require('./controllers/orders')
 const { handleChangeDataGraphQL, handleChangePasswordGraphQL } = require('./controllers/profile')
 const { handleAddingAddressGraphQL, handleDeletingAddressGraphQL, handleUpdatingAddressGraphQL, handleAddingAddress } = require('./controllers/shipping')
+const handlePayment = require('./controllers/payment')
 ;
 (async() => {
     const client = await MongoClient.connect(process.env.MONGO_URI, { useUnifiedTopology: true })
     const db = client.db('DB')
     const users = db.collection('Users')
+    const products = db.collection('Products')
 
     const typeDefs = gql`
       type Query {
         users: [User]
         user(email: String!): User!
+        userById(id: ID!): User!
       } 
       
       type User {
@@ -27,7 +32,7 @@ const { handleAddingAddressGraphQL, handleDeletingAddressGraphQL, handleUpdating
         email: String!
         password: Password!
         confirmed: Boolean!
-        phone: String
+        phone: String!
         addresses: [Address!]
         cartItems: [CartItem!]
         orders: [Order!]
@@ -113,9 +118,13 @@ const { handleAddingAddressGraphQL, handleDeletingAddressGraphQL, handleUpdating
             const resultCursor = users.find({})
             const result = await resultCursor.toArray()
             return result
-            } ,
+          },
           user: async(_, args) =>{
             const user = await users.findOne({ email : args.email })
+            return user
+          },
+          userById: async(_, args) =>{
+            const user = await users.findOne({ _id: ObjectId(args.id) })
             return user
           }
         },
@@ -165,8 +174,12 @@ const { handleAddingAddressGraphQL, handleDeletingAddressGraphQL, handleUpdating
     
     const server = new ApolloServer({ typeDefs, resolvers })
     
-    const app = express()
+    // const app = express()
     server.applyMiddleware({ app })
+    app.use(cors())
+    app.use(express.json())
+
+    app.post('/payment', (req, res) => handlePayment(req, res, users, products))
     
     app.listen({ port: 4000 }, () =>
         console.log('Now browse to http://localhost:4000' + server.graphqlPath)

@@ -17,9 +17,9 @@ const handleChangePassword = async (req, res, users) => {
     const isValid = await bcrypt.compare(password, user.password.hash)
     const hash = await bcrypt.hash(newPassword, saltRounds)
     if (!isValid) {
-        return res.status(400).json({ wrongPassword: 'Wrong Password' })
+        return res.status(400).json({ message: 'Wrong Password' })
     } else if(password === newPassword) {
-        return res.status(400).json({ samePassword: 'You Need to Write a New Password' })
+        return res.status(400).json({ message: 'You Need to Write a New Password' })
     } else {
         await users.updateOne(
             { email },
