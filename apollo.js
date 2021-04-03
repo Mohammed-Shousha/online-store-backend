@@ -2,6 +2,7 @@ const express = require('express')
 require('dotenv').config()
 const app = express()
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 const { ApolloServer, gql } = require('apollo-server-express')
 const { MongoClient, ObjectId } = require('mongodb')
 const { handleSignUpGraphQL } = require('./controllers/signup') 
@@ -130,7 +131,7 @@ const handlePayment = require('./controllers/payment')
         },
         Mutation:{
           handleSignUp: (_, args) => handleSignUpGraphQL(args, users),
-          handleSignIn: (_, args) => handleSignInGraphQL(args, users),
+          handleSignIn: (_, args, context) => handleSignInGraphQL(args, users, context),
           handleAddingItems: (_, args) => handleAddingItemsGraphQL(args, users),
           handleRemovingItems: (_, args) => handleRemovingItemsGraphQL(args, users),
           handleClearCart: (_, args) => handleClearCartGraphQL(args, users),
@@ -172,16 +173,23 @@ const handlePayment = require('./controllers/payment')
         }
     }
     
-    const server = new ApolloServer({ typeDefs, resolvers })
+  const server = new ApolloServer({ 
+    typeDefs,
+    resolvers,
+    context: ({req, res}) => ({req, res}) 
+  })
     
-    // const app = express()
-    server.applyMiddleware({ app })
-    app.use(cors())
-    app.use(express.json())
-
-    app.post('/payment', (req, res) => handlePayment(req, res, users, products))
+  app.use(cors({
+    credentials: true,
+    origin: "http://localhost:3000"
+  }))
+  app.use(cookieParser())
+  app.use(express.json())
+  server.applyMiddleware({ app, cors: false })
+  
+  app.post('/payment', (req, res) => handlePayment(req, res, users, products))
     
-    app.listen({ port: 4000 }, () =>
-        console.log('Now browse to http://localhost:4000' + server.graphqlPath)
-    )
+  app.listen({ port: 4000 }, () =>
+    console.log('Now browse to http://localhost:4000' + server.graphqlPath)
+  )
 })()
