@@ -34,9 +34,9 @@ const handleChangePassword = async (req, res, users) => {
 const handleChangeDataGraphQL = async (args, users) => {
     const { name, phone, email } = args
     const result = await users.updateOne(
-        { email },
-        { $set: { name, phone } }
-        )
+      { email },
+      { $set: { name, phone } }
+   )
     const user = await users.findOne({ email })
     return { result: result.result.nModified, user }
 }
@@ -45,18 +45,18 @@ const handleChangePasswordGraphQL = async (args, users) => {
     const { email, password, newPassword } = args
     const user = await users.findOne({ email })
     const isValid = await bcrypt.compare(password, user.password.hash)
-    const hash = await bcrypt.hash(newPassword, saltRounds)
     if (!isValid) {
-        return { message: 'Wrong Password' }
-    } else if(password === newPassword) {
-        return { message: 'You Need to Write a New Password' }
-    } else {
-        await users.updateOne(
-            { email },
-            { $set: { password: { hash, length: newPassword.length } } }
-        )
-        const user = await users.findOne({ email })
-        return user
+       return { message: 'Wrong Password' }
+      } else if(password === newPassword) {
+         return { message: 'You Need to Write a New Password' }
+      } else {
+         const hash = await bcrypt.hash(newPassword, saltRounds)
+         await users.updateOne(
+               { email },
+               { $set: { password: { hash, length: newPassword.length } } }
+         )
+         const user = await users.findOne({ email })
+         return user
     }
 }
 

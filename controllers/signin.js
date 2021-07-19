@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const SECRET = 'shit'
+const SECRET = 'supersecret'
 
 
 const handleSignIn = async (req, res, users) => {
@@ -26,7 +26,8 @@ const handleSignInGraphQL = async (args, users, { res }) => {
         const isValid = await bcrypt.compare(password, user.password.hash)
         if (isValid) {
             const token = jwt.sign({userId: user._id}, SECRET, {expiresIn: '1hr'})
-            res.cookie("id", token)
+            res.cookie('token', token, { httpOnly: false })
+            console.log(token)
             return user
         } else {
             return { message: 'Wrong Email or Password' }
