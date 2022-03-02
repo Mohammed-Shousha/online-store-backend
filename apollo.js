@@ -12,6 +12,7 @@ const { handleResendEmailGraphQL, handleConfirmationGraphQL } = require('./contr
 const { handleAddingOrderGraphQL, handleRemovingOrderGraphQL } = require('./controllers/orders')
 const { handleChangeDataGraphQL, handleChangePasswordGraphQL } = require('./controllers/profile')
 const { handleAddingAddressGraphQL, handleDeletingAddressGraphQL, handleUpdatingAddressGraphQL } = require('./controllers/shipping')
+const { handleGoogleSignIn } = require('./controllers/google')
 const handlePayment = require('./controllers/payment')
 
 ;
@@ -99,6 +100,7 @@ const handlePayment = require('./controllers/payment')
       type Mutation {
         handleSignUp(name: String!, email: String!, password: String!, phone: String!, address: String): SignUpResult
         handleSignIn(email: String!, password: String!): Response
+        handleGoogleSignIn(email:String!): Response
         handleAddingItems(email: String!, productId: Int!): CartResult
         handleRemovingItems(email: String!, productId: Int!): CartResult
         handleClearCart(email: String!): CartResult
@@ -133,6 +135,7 @@ const handlePayment = require('./controllers/payment')
       Mutation:{
          handleSignUp: (_, args) => handleSignUpGraphQL(args, users),
          handleSignIn: (_, args, context) => handleSignInGraphQL(args, users, context),
+         handleGoogleSignIn:(_, args) => handleGoogleSignIn(args, users),
          handleAddingItems: (_, args) => handleAddingItemsGraphQL(args, users),
          handleRemovingItems: (_, args) => handleRemovingItemsGraphQL(args, users),
          handleClearCart: (_, args) => handleClearCartGraphQL(args, users),
