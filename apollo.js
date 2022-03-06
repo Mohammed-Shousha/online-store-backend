@@ -5,18 +5,20 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { ApolloServer, gql } = require('apollo-server-express')
 const { MongoClient, ObjectId } = require('mongodb')
-const { handleSignUpGraphQL } = require('./controllers/signup') 
-const { handleSignInGraphQL } = require('./controllers/signin') 
-const { handleAddingItemsGraphQL, handleRemovingItemsGraphQL, handleClearCartGraphQL } = require('./controllers/cartItems') 
+const { handleSignUpGraphQL } = require('./controllers/signup')
+const { handleSignInGraphQL } = require('./controllers/signin')
+const { handleAddingItemsGraphQL, handleRemovingItemsGraphQL, handleClearCartGraphQL } = require('./controllers/cartItems')
 const { handleResendEmailGraphQL, handleConfirmationGraphQL } = require('./controllers/confirm')
 const { handleAddingOrderGraphQL, handleRemovingOrderGraphQL } = require('./controllers/orders')
 const { handleChangeDataGraphQL, handleChangePasswordGraphQL } = require('./controllers/profile')
 const { handleAddingAddressGraphQL, handleDeletingAddressGraphQL, handleUpdatingAddressGraphQL } = require('./controllers/shipping')
 const { handleGoogleSignIn } = require('./controllers/google')
+const { addProduct, getProducts, getProductById, getProductsByType, getProductsByBrand, getProductsByName } = require('./controllers/products')
+const { getUsers, getUserByEmail, getUserById } = require('./controllers/users')
 const handlePayment = require('./controllers/payment')
 
-;
-(async() => {
+   ;
+(async () => {
    const client = await MongoClient.connect(process.env.MONGO_URI, { useUnifiedTopology: true })
    const db = client.db('DB')
    const users = db.collection('Users')
@@ -25,8 +27,13 @@ const handlePayment = require('./controllers/payment')
    const typeDefs = gql`
       type Query {
          users: [User]
-         user(email: String!): User!
-         userById(id: ID!): User!
+         user (email: String!): User!
+         userById( id: ID!): User!
+         products: [Product]
+         productById (id: ID!): Product
+         productsByType (type: String!): [Product]
+         productsByBrand (type: String!, brand: String!): [Product]
+         productsByName (name: String!): [Product]
       } 
       
       type User {
@@ -54,7 +61,7 @@ const handlePayment = require('./controllers/payment')
       }
 
       type CartItem {
-        productId: Int!
+        productId: ID!
         qty: Int!
       }
 
@@ -96,13 +103,23 @@ const handlePayment = require('./controllers/payment')
         result: Int! # 1 'Success' or 0 'Failed'
         addresses: [Address!]
       }
+
+      type Product {
+         _id: ID!
+         name: String!
+         type: String!
+         brand: String
+         price: Int!
+         photo: String!
+         description: String
+      }
       
       type Mutation {
         handleSignUp(name: String!, email: String!, password: String!, phone: String!, address: String): SignUpResult
         handleSignIn(email: String!, password: String!): Response
         handleGoogleSignIn(email:String!): Response
-        handleAddingItems(email: String!, productId: Int!): CartResult
-        handleRemovingItems(email: String!, productId: Int!): CartResult
+        handleAddingItems(email: String!, productId: ID!): CartResult
+        handleRemovingItems(email: String!, productId: ID!): CartResult
         handleClearCart(email: String!): CartResult
         handleAddingOrder(email: String!): OrderResult
         handleRemovingOrder(email: String!, orderId: ID!): OrderResult
@@ -113,29 +130,25 @@ const handlePayment = require('./controllers/payment')
         handleAddingAddress(name: String!, email: String!, phone: String!, address: String!): AddressResult
         handleDeletingAddress(email: String!, addressId: ID!): AddressResult
         handleUpdatingAddress(addressId: ID!, name: String, phone: String, address: String): AddressResult
+        addProduct(name: String!, type: String!, brand: String, price: Int!, photo: String!, description: String ): Product
       }
    `
-    
+
    const resolvers = {
       Query: {
-         users : async() => {
-         const resultCursor = users.find({})
-         const result = await resultCursor.toArray()
-         return result
-         },
-         user: async(_, args) =>{
-         const user = await users.findOne({ email : args.email })
-         return user
-         },
-         userById: async(_, args) =>{
-         const user = await users.findOne({ _id: ObjectId(args.id) })
-         return user
-         }
+         users: (_) => getUsers(users),
+         user: (_, args) => getUserByEmail(args, users),
+         userById: (_, args) => getUserById(args, users),
+         products: (_) => getProducts(products),
+         productById: (_, args) => getProductById(args, products),
+         productsByType: (_, args) => getProductsByType(args, products),
+         productsByBrand: (_, args) => getProductsByBrand(args, products),
+         productsByName: (_, args) => getProductsByName(args, products)
       },
-      Mutation:{
+      Mutation: {
          handleSignUp: (_, args) => handleSignUpGraphQL(args, users),
          handleSignIn: (_, args, context) => handleSignInGraphQL(args, users, context),
-         handleGoogleSignIn:(_, args) => handleGoogleSignIn(args, users),
+         handleGoogleSignIn: (_, args) => handleGoogleSignIn(args, users),
          handleAddingItems: (_, args) => handleAddingItemsGraphQL(args, users),
          handleRemovingItems: (_, args) => handleRemovingItemsGraphQL(args, users),
          handleClearCart: (_, args) => handleClearCartGraphQL(args, users),
@@ -147,54 +160,55 @@ const handlePayment = require('./controllers/payment')
          handleChangePassword: (_, args) => handleChangePasswordGraphQL(args, users),
          handleAddingAddress: (_, args) => handleAddingAddressGraphQL(args, users),
          handleDeletingAddress: (_, args) => handleDeletingAddressGraphQL(args, users),
-         handleUpdatingAddress: (_, args) => handleUpdatingAddressGraphQL(args, users)
+         handleUpdatingAddress: (_, args) => handleUpdatingAddressGraphQL(args, users),
+         addProduct: (_, args) => addProduct(args, products)
       },
-      Response:{
-         __resolveType(obj){
-         if (obj._id) {
-            return 'User'
-         }
+      Response: {
+         __resolveType(obj) {
+            if (obj._id) {
+               return 'User'
+            }
 
-         if (obj.message) {
-            return 'Error'
-         }
+            if (obj.message) {
+               return 'Error'
+            }
 
-         return null
+            return null
          }
       },
-      SignUpResult:{
-         __resolveType(obj){
-         if (obj.user) {
-            return 'Result'
-         }
+      SignUpResult: {
+         __resolveType(obj) {
+            if (obj.user) {
+               return 'Result'
+            }
 
-         if (obj.message) {
-            return 'Error'
-         }
+            if (obj.message) {
+               return 'Error'
+            }
 
-         return null
+            return null
          }
       }
    }
 
-//     const context = ({ req }) => {
-//   const token = req.headers.authorization || ''
+   //     const context = ({ req }) => {
+   //   const token = req.headers.authorization || ''
 
-//   try {
-//     return { id, email } = jwt.verify(token.split(' ')[1], SECRET_KEY)
-//   } catch (e) {
-//     throw new AuthenticationError(
-//       'Authentication token is invalid, please log in',
-//     )
-//   }
-// }
-    
-   const server = new ApolloServer({ 
+   //   try {
+   //     return { id, email } = jwt.verify(token.split(' ')[1], SECRET_KEY)
+   //   } catch (e) {
+   //     throw new AuthenticationError(
+   //       'Authentication token is invalid, please log in',
+   //     )
+   //   }
+   // }
+
+   const server = new ApolloServer({
       typeDefs,
       resolvers,
-      context: ({req, res}) => ({req, res}) 
+      context: ({ req, res }) => ({ req, res })
    })
-    
+
    app.use(cors({
       credentials: true,
       origin: "http://localhost:3000"
@@ -202,9 +216,9 @@ const handlePayment = require('./controllers/payment')
    app.use(cookieParser())
    app.use(express.json())
    server.applyMiddleware({ app, cors: false })
-  
+
    app.post('/payment', (req, res) => handlePayment(req, res, users, products))
-      
+
    app.listen({ port: 4000 }, () =>
       console.log('Now browse to http://localhost:4000' + server.graphqlPath)
    )
