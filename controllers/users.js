@@ -1,3 +1,5 @@
+const { ObjectId } = require('mongodb')
+
 const getUsers = async (users) => {
    const resultCursor = users.find({})
    const result = await resultCursor.toArray()
@@ -11,12 +13,20 @@ const getUserByEmail = async (args, users) => {
 }
 
 const getUserById = async (args, users) => {
-   const user = await users.findOne({ _id: ObjectId(args.id) })
+   const { id } = args
+   const user = await users.findOne({ _id: ObjectId(id) })
+   return user
+}
+
+const getUserByToken = async (users, { req }) => {
+   const { id } = req
+   const user = await users.findOne({ _id: ObjectId(id) })
    return user
 }
 
 module.exports = {
    getUsers,
    getUserByEmail,
-   getUserById
+   getUserById,
+   getUserByToken
 }

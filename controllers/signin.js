@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const SECRET = 'supersecret'
-
+const { createTokens } = require('./functions')
+require('dotenv').config()
 
 const handleSignIn = async (req, res, users) => {
    const { email, password } = req.body
@@ -25,9 +24,7 @@ const handleSignInGraphQL = async (args, users, { res }) => {
    if (user) {
       const isValid = await bcrypt.compare(password, user.password.hash)
       if (isValid) {
-         const token = jwt.sign({ userId: user._id }, SECRET, { expiresIn: '1hr' })
-         res.cookie('token', token, { httpOnly: false })
-         console.log(token)
+         createTokens(user, res)
          return user
       } else {
          return { message: 'Wrong Email or Password' }
@@ -37,4 +34,7 @@ const handleSignInGraphQL = async (args, users, { res }) => {
    }
 }
 
-module.exports = { handleSignIn, handleSignInGraphQL }
+module.exports = { 
+   handleSignIn,
+   handleSignInGraphQL
+}

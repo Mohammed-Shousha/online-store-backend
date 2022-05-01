@@ -1,3 +1,5 @@
+const { ObjectId } = require('mongodb')
+
 const addProduct = async (args, products) => {
    const { name, type, brand, price, photo, description } = args
 
@@ -45,7 +47,6 @@ const getProductsByName = async (args, products) => {
    const result = await resultCursor.toArray()
    return result
 }
-
 
 module.exports = { 
    addProduct,

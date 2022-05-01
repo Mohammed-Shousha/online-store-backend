@@ -1,5 +1,6 @@
-require('dotenv').config()
+const { ObjectId } = require('mongodb')
 const stripe = require("stripe")(process.env.STRIPE_KEY)
+require('dotenv').config()
 
 const handlePayment = async (req, res, users, products) => {
     const { email } = req.body
@@ -8,7 +9,7 @@ const handlePayment = async (req, res, users, products) => {
     const items = user.cartItems
     for (let i = 0; i < items.length; i++) {
         let { productId, qty } = items[i]
-        const product = await products.findOne({ id: productId })
+        const product = await products.findOne({ _id: ObjectId(productId) })
         prices.push(product.price * qty)
     }
     let amount = prices.reduce((t, price) => t + price, 0) * 100
