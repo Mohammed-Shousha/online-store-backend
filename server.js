@@ -62,7 +62,7 @@ const { handleConfirmation, handleResendEmail } = require('./controllers/confirm
 		
 		app.put('/clearcart', (req, res) => handleClearCart(req, res, users))
 		
-		app.put('/addorder', (req, res) => handleAddingOrder(req, res, users))
+		app.put('/addorder', (req, res) => handleAddingOrder(req, res, users, products))
 		
 		app.put('/removeorder', (req, res) => handleRemovingOrder(req, res, users))
 		

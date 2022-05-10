@@ -65,7 +65,8 @@ const handleDeletingAddressGraphQL = async (args, users, { req }) => {
       { _id: ObjectId(id) },
       { $pull: { addresses: { id: ObjectId(addressId) } } },
       options
-      )
+   )
+
    const { ok, value } = result
    const { addresses } = value
    return { result: ok, addresses }

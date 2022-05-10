@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { ApolloServer, gql } = require('apollo-server-express')
-const { verify }= require('jsonwebtoken')
+const { verify } = require('jsonwebtoken')
 const { MongoClient, ObjectId } = require('mongodb')
 const { handleSignUpGraphQL } = require('./controllers/signup')
 const { handleSignInGraphQL } = require('./controllers/signin')
@@ -171,7 +171,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
          handleAddingItems: (_, args, context) => handleAddingItemsGraphQL(args, users, context),
          handleRemovingItems: (_, args, context) => handleRemovingItemsGraphQL(args, users, context),
          handleClearCart: (_, __, context) => handleClearCartGraphQL(users, context),
-         handleAddingOrder: (_, __, context) => handleAddingOrderGraphQL(users, context),
+         handleAddingOrder: (_, __, context) => handleAddingOrderGraphQL(users, products, context),
          handleRemovingOrder: (_, args) => handleRemovingOrderGraphQL(args, users),
          handleClearOrders: (_, args) => handleClearOrdersGraphQL(args, users),
          handleConfirmation: (_, __, context) => handleConfirmationGraphQL(users, context),
@@ -183,7 +183,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
          handleChangePassword: (_, args, context) => handleChangePasswordGraphQL(args, users, context),
          handleAddingAddress: (_, args, context) => handleAddingAddressGraphQL(args, users, context),
          handleDeletingAddress: (_, args, context) => handleDeletingAddressGraphQL(args, users, context),
-         handleUpdatingAddress: (_, args, context) => handleUpdatingAddressGraphQL(args, users, context),
+         handleUpdatingAddress: (_, args) => handleUpdatingAddressGraphQL(args, users),
          addProduct: (_, args) => addProduct(args, products)
       },
       Response: {
@@ -231,7 +231,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
    app.use(express.json())
    app.use(async (req, res, next) => {
       const { accessToken, refreshToken } = req.cookies
-      
+
       if (!refreshToken && !accessToken) {
          return next()
       }
@@ -240,7 +240,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
          const { id } = verify(accessToken, ACCESS_TOKEN_SECRET)
          req.id = id
          return next()
-      } catch (error){}
+      } catch (error) { }
 
       if (!refreshToken) {
          return next()
@@ -250,12 +250,12 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
 
       try {
          data = verify(refreshToken, REFRESH_TOKEN_SECRET)
-      } catch(error) {
+      } catch (error) {
          return next()
       }
 
       const user = await users.findOne({ _id: ObjectId(data.id) })
-      
+
       if (!user) {
          return next()
       }
@@ -266,7 +266,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
 
       next()
    }
-)
+   )
    server.applyMiddleware({ app, cors: false })
 
    app.post('/payment', (req, res) => handlePayment(req, res, users, products))
