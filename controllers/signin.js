@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const { createTokens } = require('./functions')
-require('dotenv').config()
+
 
 const handleSignIn = async (req, res, users) => {
    const { email, password } = req.body

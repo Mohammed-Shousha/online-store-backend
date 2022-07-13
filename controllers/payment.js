@@ -1,6 +1,7 @@
 const { ObjectId } = require('mongodb')
-const stripe = require("stripe")(process.env.STRIPE_KEY)
 require('dotenv').config()
+
+const stripe = require("stripe")(process.env.STRIPE_KEY)
 
 const handlePayment = async (req, res, users, products) => {
     const { email } = req.body

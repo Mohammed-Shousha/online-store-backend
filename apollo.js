@@ -128,7 +128,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
       
       type Mutation {
          handleSignIn(email: String!, password: String!): Response
-         handleGoogleSignIn(email:String!): Response
+         handleGoogleSignIn(token: String!): Response
          handleSignUp(name: String!, email: String!, password: String!, phone: String!, address: String): SignUpResult
          handleSignOut: Int! # 1 'Success' or 0 'Failed'
          handleAddingItems(productId: ID!): CartResult
