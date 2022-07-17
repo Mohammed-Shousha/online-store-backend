@@ -146,7 +146,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
          handleChangePassword(password: String!, newPassword: String!): Response
          handleAddingAddress(name: String!, phone: String!, address: String!): AddressResult
          handleDeletingAddress(addressId: ID!): AddressResult
-         handleUpdatingAddress(addressId: ID!, name: String, phone: String, address: String): AddressResult
+         handleUpdatingAddress(addressId: ID!, name: String!, phone: String!, address: String!): AddressResult
          addProduct(name: String!, type: String!, brand: String, price: Int!, photo: String!, description: String): Product
       }
    `

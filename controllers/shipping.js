@@ -66,14 +66,13 @@ const handleDeletingAddressGraphQL = async (args, users, { req }) => {
       { $pull: { addresses: { id: ObjectId(addressId) } } },
       options
    )
-
    const { ok, value } = result
    const { addresses } = value
    return { result: ok, addresses }
 }
 
 const handleUpdatingAddressGraphQL = async (args, users) => {
-   const { addressId, name, address, phone } = args
+   const { addressId, name, phone, address } = args
    const result = await users.findOneAndUpdate(
       { "addresses.id": ObjectId(addressId) },
       {
