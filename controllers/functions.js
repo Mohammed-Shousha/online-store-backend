@@ -6,7 +6,6 @@ const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
 const token_options = {
    sameSite: "none",
    secure: true,
-   domain: "http://localhost:3000",
    httpOnly: true
 }
 

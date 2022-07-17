@@ -1,7 +1,6 @@
 const token_options = {
    sameSite: "none",
    secure: true,
-   domain: "http://localhost:3000",
    httpOnly: true
 }
 
