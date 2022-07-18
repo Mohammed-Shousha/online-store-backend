@@ -1,3 +1,9 @@
+const token_options = {
+   sameSite: "none",
+   secure: true,
+   httpOnly: true
+}
+
 const handleSignOut = (req, res) => {
    res.clearCookie('refreshToken')
    res.clearCookie('accessToken')
@@ -5,8 +11,8 @@ const handleSignOut = (req, res) => {
 
 // GraphQL
 const handleSignOutGraqhql = ({ res }) => {
-   res.clearCookie('refreshToken')
-   res.clearCookie('accessToken')
+   res.clearCookie('refreshToken', token_options)
+   res.clearCookie('accessToken', token_options)
    return 1
 }
 
