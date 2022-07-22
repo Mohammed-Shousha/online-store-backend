@@ -6,7 +6,8 @@ const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
 const token_options = {
    sameSite: "none",
    secure: true,
-   httpOnly: true
+   httpOnly: true,
+   maxAge: 7*24*60*60*1000 // 7 days
 }
 
 const createTokens = (user, res) => {

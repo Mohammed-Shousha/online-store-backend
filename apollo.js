@@ -271,8 +271,9 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
 
    app.post('/payment', (req, res) => handlePayment(req, res, users, products))
 
-
-   app.listen({ port: process.env.PORT || 4000 }, () =>
-      console.log('Now browse to http://localhost:4000' + server.graphqlPath)
+   const port = process.env.PORT || 4000 
+   
+   app.listen({ port }, () =>
+      console.log(`Now browse to http://localhost:${port}/${server.graphqlPath}`)
    )
 })()
