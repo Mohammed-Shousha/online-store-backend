@@ -275,6 +275,6 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
    const port = process.env.PORT || 4000 
    
    app.listen({ port }, () =>
-      console.log(`Now browse to http://localhost:${port}/${server.graphqlPath}`)
+      console.log(`Now browse to http://localhost:${port}${server.graphqlPath}`)
    )
 })()

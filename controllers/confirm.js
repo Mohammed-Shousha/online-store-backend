@@ -21,7 +21,7 @@ const sendConfirmationEmail = async (user) => {
       html: `<h1> Hi ${name}, </h1>
         <h1>Thank You for Signing Up in Online-Store</h1>
         <h2>Please Click the Link Below to Redirect You to The Confirmation Page</h2>
-        <h2><a href='http://localhost:3000/confirm/${_id}'> Click Here </a></h2>`,
+        <h2><a href='https://online-store-react-app.herokuapp.com/confirm/${_id}'> Click Here </a></h2>`,
    })
    return info.messageId
 }

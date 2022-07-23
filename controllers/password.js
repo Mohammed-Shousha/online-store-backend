@@ -23,7 +23,7 @@ const sendForgetPasswordEmail = async (user, token) => {
       text: `Hi ${name}, follow the instructions to reset your password`, // plain text body
       html: `<h1> Hi ${name}, </h1>
         <h2>Please Click the Link Below to reset your password</h2>
-        <h3><a href='http://localhost:3000/resetpassword/${token}'> Click Here </a></h3>
+        <h3><a href='https://online-store-react-app.herokuapp.com/resetpassword/${token}'> Click Here </a></h3>
         <p> This Link will be expired in 15 minutes </p>`,
    })
    return info.messageId
