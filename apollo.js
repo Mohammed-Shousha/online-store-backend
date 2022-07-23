@@ -225,7 +225,8 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
 
    app.use(cors({
       credentials: true,
-      origin: "https://online-store-react-app.herokuapp.com"
+      origin: "https://online-store-react-app.herokuapp.com",
+      // origin: "http://localhost:3000"
    }))
    app.use(cookieParser())
    app.use(express.json())

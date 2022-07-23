@@ -13,10 +13,11 @@ const orderTime = () => {
    let hours = date.getHours()
    let minutes = date.getMinutes()
    let ampm = hours >= 12 ? 'pm' : 'am'
+   let timeZone = String(date).split(' ')[5]
    hours = hours % 12
    hours = hours ? hours : 12
    minutes = minutes < 10 ? '0' + minutes : minutes
-   let now = hours + ':' + minutes + ' ' + ampm
+   let now = hours + ':' + minutes + ' ' + ampm + ' ' + timeZone
    return today + ' ' + now
 }
 
