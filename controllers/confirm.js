@@ -38,8 +38,9 @@ const handleResendEmail = async (req, res, users) => {
 }
 
 const handleConfirmation = async (req, res, users) => {
+   const { id } = req.body
    const result = await users.updateOne(
-      { _id: ObjectId(req.params.id) },
+      { _id: ObjectId(id) },
       {
          $set: {
             confirmed: true
@@ -59,8 +60,8 @@ const handleResendEmailGraphQL = async (users, { req }) => {
    return result
 }
 
-const handleConfirmationGraphQL = async (users, { req }) => {
-   const { id } = req
+const handleConfirmationGraphQL = async (args, users) => {
+   const { id } = args
    const result = await users.updateOne(
       { _id: ObjectId(id) },
       {

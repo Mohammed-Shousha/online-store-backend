@@ -137,7 +137,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
          handleAddingOrder: OrderResult
          handleRemovingOrder(email: String!, orderId: ID!): OrderResult
          handleClearOrders(email: String!): Int # 1 'Success' or 0 'Failed'  
-         handleConfirmation: Int! # 1 'Success' or 0 'Failed'  
+         handleConfirmation(id: ID!): Int! # 1 'Success' or 0 'Failed'  
          handleResendEmail: Int! # 1 'Success' or 0 'Failed'  
          handleForgetPassword(email: String): ForgetPasswordResult!
          handleResetPassword(token: String!, password: String!): Int! # 1 'Success' or 0 'Failed'
@@ -174,7 +174,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
          handleAddingOrder: (_, __, context) => handleAddingOrderGraphQL(users, products, context),
          handleRemovingOrder: (_, args) => handleRemovingOrderGraphQL(args, users),
          handleClearOrders: (_, args) => handleClearOrdersGraphQL(args, users),
-         handleConfirmation: (_, __, context) => handleConfirmationGraphQL(users, context),
+         handleConfirmation: (_, args) => handleConfirmationGraphQL(args, users),
          handleResendEmail: (_, __, context) => handleResendEmailGraphQL(users, context),
          handleForgetPassword: (_, args) => handleForgetPasswordGraphQL(args, users),
          handleResetPassword: (_, args, context) => handleResetPasswordGraphQL(args, users, context),
