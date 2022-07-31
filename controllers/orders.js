@@ -7,18 +7,14 @@ const { GMAIL_USER, GMAIL_PASS } = process.env
 
 const orderTime = () => {
    let date = new Date()
-   let today = date.getDate() + '/'
-      + (date.getMonth() + 1) + '/'
-      + date.getFullYear()
-   let hours = date.getHours()
-   let minutes = date.getMinutes()
-   let ampm = hours >= 12 ? 'pm' : 'am'
-   let timeZone = String(date).split(' ')[5]
-   hours = hours % 12
-   hours = hours ? hours : 12
-   minutes = minutes < 10 ? '0' + minutes : minutes
-   let now = hours + ':' + minutes + ' ' + ampm + ' ' + timeZone
-   return today + ' ' + now
+   date = date.toLocaleString('en-GB', 
+      { hour12: true,
+         timeZone: 'Africa/Cairo',
+         dateStyle: "short",
+         timeStyle: "short" 
+      })
+   dateArr = date.split(',')
+   return dateArr[0] + ' ' + dateArr[1]
 }
 
 const productsFromOrder = (order, products) => {
