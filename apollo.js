@@ -227,7 +227,7 @@ const { MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
       credentials: true,
       // origin: "https://online-store-react-app.herokuapp.com",
       origin: "http://localhost:3000",
-      origin: "https://online-store-swart.vercel.app",
+      // origin: "https://online-store-swart.vercel.app",
    }))
    app.use(cookieParser())
    app.use(express.json())
